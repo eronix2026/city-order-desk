@@ -164,7 +164,7 @@ header{border-bottom:.5px solid var(--sep);padding:18px 0 16px;margin-bottom:20p
 
 <script>
 /* ---------- config ---------- */
-const PROD_HOSTS=['orders.eronix.in'];        // demo can NEVER be true on these
+const PROD_HOSTS=['orderdesk.eronix.in','orders.eronix.in'];        // demo can NEVER be true on these
 const DEMO_INTENT=true;                        // set false for a locked production build
 const DEMO_MODE = DEMO_INTENT && !PROD_HOSTS.includes((location.hostname||'').toLowerCase());
 const API='/.netlify/functions/aggregation';
