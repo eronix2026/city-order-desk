@@ -1,7 +1,7 @@
 /* ERONIX City Order Desk — service worker
    Precaches the app shell + the self-hosted Code 128 scan engine so the portal
    installs and scans offline on Android and iOS. Bump CACHE on every release. */
-const CACHE = 'codesk-v34';
+const CACHE = 'codesk-v35';
 const PRECACHE = [
   '/', '/index.html', '/manifest.webmanifest',
   '/icons/icon-192.png', '/icons/icon-512.png',
