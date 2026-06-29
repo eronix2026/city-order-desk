@@ -1,0 +1,10 @@
+﻿{
+  "name": "city-order-desk",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "ERONIX City Order Desk - per-city Accounts/Warehouse order desk (Netlify).",
+  "dependencies": {
+    "@netlify/blobs": "^10.7.9"
+  }
+}
