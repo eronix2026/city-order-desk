@@ -1,0 +1,37 @@
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+# WASM must be served with the right MIME type and cached hard (immutable).
+[[headers]]
+  for = "/vendor/zxing/zxing_reader.wasm"
+  [headers.values]
+    Content-Type = "application/wasm"
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/vendor/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# The service worker and manifest should never be cached stale.
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+# Pull Unolo orders from Zoho every 5 min (the no-new-credentials inbound path).
+[functions."unolo-poll"]
+  schedule = "*/5 * * * *"
+
+# Housekeeping: release stale reservations + re-apply deferred consumption.
+[functions."reconcile"]
+  schedule = "*/15 * * * *"
+
+# Auto-release credit holds once the dealer settles (asks Dealer OS for the current credit truth).
+[functions."credit-release"]
+  schedule = "*/15 * * * *"

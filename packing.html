@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ERONIX · Aggregation Desk</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#000;--surface:#121214;--surface2:#1a1a1d;--label:#f5f5f7;--label2:#98989d;--label3:#636366;--label4:#48484a;
+ --sep:rgba(255,255,255,.09);--sep2:rgba(255,255,255,.055);--blue:#0a84ff;
+ --green:#30d158;--amber:#ff9f0a;--yellow:#ffd60a;--red:#ff453a;--purple:#bf5af2;--teal:#64d2ff;
+ --font:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Inter","Helvetica Neue",sans-serif;}
+body{background:var(--bg);color:var(--label);font-family:var(--font);letter-spacing:-.014em;line-height:1.5;-webkit-font-smoothing:antialiased;padding-bottom:60px}
+a,button,input,select{font-family:inherit;color:inherit}
+.wrap{max-width:760px;margin:0 auto;padding:0 18px}
+header{border-bottom:.5px solid var(--sep);padding:18px 0 16px;margin-bottom:20px;position:sticky;top:0;background:rgba(0,0,0,.82);backdrop-filter:saturate(180%) blur(20px);z-index:20}
+.brand{font-size:18px;font-weight:700;letter-spacing:-.02em}
+.brand span{color:var(--label3);font-weight:500;font-size:11px;letter-spacing:.12em;margin-left:9px;text-transform:uppercase}
+.who{float:right;font-size:12px;color:var(--label2);margin-top:5px}
+.who b{color:var(--label);font-weight:600}
+.tabs{display:flex;gap:6px;margin-bottom:22px}
+.tab{flex:1;text-align:center;padding:10px;border-radius:11px;background:var(--surface);border:.5px solid var(--sep);font-size:13px;font-weight:600;color:var(--label2);cursor:pointer;transition:.16s}
+.tab.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.panel{display:none}.panel.on{display:block}
+.card{background:var(--surface);border:.5px solid var(--sep);border-radius:16px;padding:18px;margin-bottom:16px}
+.card h3{font-size:14px;font-weight:600;margin-bottom:4px}
+.card .sub{font-size:12px;color:var(--label3);margin-bottom:14px;line-height:1.45}
+.row{display:flex;gap:9px}
+.in{flex:1;background:var(--surface2);border:.5px solid var(--sep);border-radius:11px;padding:11px 13px;color:var(--label);font-size:13.5px;letter-spacing:.02em;outline:none;text-transform:uppercase}
+.in::placeholder{color:var(--label4);text-transform:none;letter-spacing:0}
+.in:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(10,132,255,.18)}
+.in.sm{font-size:12.5px;padding:9px 11px}
+.btn{border:none;border-radius:11px;padding:0 16px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;transition:.16s}
+.btn.blue{background:var(--blue);color:#fff}.btn.green{background:var(--green);color:#04210d}
+.btn.ghost{background:rgba(255,255,255,.06);color:var(--label2)}.btn.ghost:hover{color:var(--teal)}
+.btn.wide{width:100%;padding:13px}
+.btn:disabled{opacity:.4;cursor:default}
+.mcline{display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:.5px solid var(--sep);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.mcline .t{font-size:13.5px;font-weight:600}.mcline .m{font-size:11.5px;color:var(--label3)}
+.octag{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.035);border:.5px solid var(--sep2);border-radius:10px;padding:9px 12px;margin-top:8px}
+.octag .nm{font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums}
+.octag .ct{font-size:11.5px;color:var(--teal)}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+.chip{font-size:10.5px;background:rgba(255,255,255,.06);border-radius:6px;padding:3px 7px;color:var(--label2);font-variant-numeric:tabular-nums}
+.chip .x{margin-left:5px;color:var(--label4);cursor:pointer}
+.x:hover{color:var(--red)}
+.mode{display:flex;gap:5px;margin:0 0 8px}
+.mode button{flex:1;padding:7px;border-radius:8px;background:var(--surface2);border:.5px solid var(--sep);font-size:11.5px;font-weight:600;color:var(--label3);cursor:pointer}
+.mode button.on{background:rgba(10,132,255,.16);border-color:var(--blue);color:var(--blue)}
+.ocrow{border:.5px solid var(--sep2);border-radius:12px;padding:12px;margin-top:10px;background:rgba(255,255,255,.02)}
+.muted{font-size:11.5px;color:var(--label3);margin-top:7px;line-height:1.45}
+.add{font-size:12px;font-weight:600;color:var(--blue);cursor:pointer;display:inline-block;margin-top:11px}
+.del{font-size:11px;color:var(--label4);cursor:pointer}.del:hover{color:var(--red)}
+.result{font-size:13px;line-height:1.7}
+.result .k{color:var(--label3)}.result .v{color:var(--label);font-weight:600;font-variant-numeric:tabular-nums}
+.pill{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:2px 8px;border-radius:6px;text-transform:uppercase}
+.pill.intact{background:rgba(48,209,88,.16);color:var(--green)}
+.pill.opened{background:rgba(255,159,10,.16);color:var(--amber)}
+.pill.empty{background:rgba(255,69,58,.16);color:var(--red)}
+.pill.accounts{background:rgba(0,122,255,.16);color:#007AFF}
+.pill.warehouse{background:rgba(175,82,222,.16);color:#AF52DE}
+.pill.admin{background:rgba(52,199,89,.18);color:#248A3D}
+.srow{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface2);border:.5px solid var(--sep);border-radius:12px;padding:11px 14px;margin-bottom:8px}
+.srow .nm{font-size:13.5px;font-weight:600}
+.srow .em{font-size:11.5px;color:var(--label3)}
+.srow .meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:3px}
+.srow .acts{display:flex;gap:6px;flex:none}
+.srow .acts button{font-size:11.5px;font-weight:600;border-radius:8px;padding:6px 11px;cursor:pointer}
+.srow .ed{background:rgba(120,120,128,.12);color:var(--label2)}
+.srow .rm{background:rgba(255,69,58,.12);color:var(--red)}
+.srctag{font-size:10px;color:var(--label4);text-transform:uppercase;letter-spacing:.04em}
+.gate{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;text-align:center;padding:30px;z-index:50}
+.gate.hide{display:none}
+.gate .g{max-width:340px}.gate h2{font-size:18px;margin-bottom:8px}.gate p{font-size:13px;color:var(--label2);line-height:1.55}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(80px);background:var(--surface2);border:.5px solid var(--sep);border-radius:12px;padding:12px 18px;font-size:13px;font-weight:500;opacity:0;transition:.28s;z-index:60;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.demobar{background:#3a2d0a;color:var(--yellow);font-size:11.5px;text-align:center;padding:6px;font-weight:600}
+.empty{text-align:center;color:var(--label3);font-size:12.5px;padding:18px 0}
+</style>
+</head>
+<body>
+<div class="gate hide" id="gate"><div class="g"><h2 id="gateH">Checking access…</h2><p id="gateP">One moment.</p></div></div>
+<div class="demobar" id="demobar" style="display:none">DEMO — builds an in-memory map; nothing is sent to the server</div>
+
+<header><div class="wrap"><span class="brand">ERONIX<span>Aggregation Desk</span></span><span class="who" id="who"></span></div></header>
+
+<div class="wrap">
+ <div class="tabs">
+  <div class="tab on" data-p="station" onclick="tab('station')">Packing station</div>
+  <div class="tab" data-p="bulk" onclick="tab('bulk')">Bulk import</div>
+  <div class="tab" data-p="look" onclick="tab('look')">Look up</div>
+  <div class="tab" data-p="staff" onclick="tab('staff')">Staff</div>
+ </div>
+
+ <!-- ===== PACKING STATION ===== -->
+ <div class="panel on" id="p-station">
+  <div class="card">
+   <h3>Scan to build a master carton</h3>
+   <div class="sub">Scan or type a code — it routes itself: a master carton sets the box, an outer carton opens a layer, a unit serial drops into the open outer carton. Or fill a sealed outer carton from its first serial + a count.</div>
+   <div class="row"><input class="in" id="scan" placeholder="Scan MC / OC / unit serial…" autocomplete="off" autocapitalize="characters" spellcheck="false" onkeydown="if(event.key==='Enter'){onScan(this.value);this.value=''}"><button class="btn blue" onclick="const i=document.getElementById('scan');onScan(i.value);i.value=''">Add</button></div>
+   <div class="row" style="margin-top:9px"><input class="in sm" id="rfStart" placeholder="First S/N of sealed OC…" autocomplete="off" autocapitalize="characters" spellcheck="false"><input class="in sm" id="rfCount" style="max-width:92px" placeholder="qty" inputmode="numeric"><button class="btn ghost" onclick="rangeIntoActive()">Fill OC ⌁</button></div>
+   <div class="muted">A unit needs an open outer carton first. Seal it before scanning the next one.</div>
+  </div>
+
+  <div class="card" id="buildCard">
+   <h3>Current carton</h3>
+   <div id="buildBody"></div>
+   <div class="row" style="margin-top:14px">
+    <button class="btn ghost" style="flex:1" id="sealBtn" onclick="sealOc()">Seal outer carton</button>
+    <button class="btn green" style="flex:1" id="commitBtn" onclick="commitMc()">Commit master carton</button>
+   </div>
+  </div>
+ </div>
+
+ <!-- ===== BULK IMPORT ===== -->
+ <div class="panel" id="p-bulk">
+  <div class="card">
+   <h3>Bulk import</h3>
+   <div class="sub">Enter one or more master cartons. For each outer carton, give a serial range (first S/N + count) for a sealed run, or paste an explicit serial list. Validate, then import.</div>
+   <div id="bulkBody"></div>
+   <span class="add" onclick="addMc()">+ Add master carton</span>
+   <div class="row" style="margin-top:16px">
+    <button class="btn ghost" style="flex:1" onclick="previewBulk()">Validate &amp; preview</button>
+    <button class="btn green" style="flex:1" id="importBtn" onclick="importBulk()" disabled>Import</button>
+   </div>
+   <div id="bulkPreview" class="muted"></div>
+  </div>
+ </div>
+
+ <!-- ===== LOOK UP ===== -->
+ <div class="panel" id="p-look">
+  <div class="card">
+   <h3>Look up the map</h3>
+   <div class="sub">A unit serial returns its outer + master carton and status. A master carton returns its state (intact / opened / empty) and per-OC counts. An outer carton returns its contents.</div>
+   <div class="row"><input class="in" id="lookCode" placeholder="Scan / type any code…" autocomplete="off" autocapitalize="characters" spellcheck="false" onkeydown="if(event.key==='Enter')doLook()"><button class="btn blue" onclick="doLook()">Look up</button></div>
+   <div id="lookResult"></div>
+  </div>
+ </div>
+
+ <!-- ===== STAFF ===== -->
+ <div class="panel" id="p-staff">
+  <div class="card">
+   <h3 id="staffFormTitle">Add staff</h3>
+   <div class="sub">There is no self sign-up — role and city are assigned here. New staff sign in with email + OTP; their first login is their registration.</div>
+   <div class="row" style="margin-bottom:9px"><input class="in" id="stEmail" placeholder="work email (you@eronix.in)" autocomplete="off" spellcheck="false" style="text-transform:none"></div>
+   <div class="row" style="margin-bottom:9px"><input class="in" id="stName" placeholder="full name" autocomplete="off" style="text-transform:none"></div>
+   <div class="row">
+    <select class="in" id="stRole" style="text-transform:none"><option value="accounts">Accounts</option><option value="warehouse">Warehouse</option><option value="admin">Admin</option></select>
+    <select class="in" id="stCity" style="text-transform:none"><option>Kolkata</option><option>Mumbai</option><option>Delhi</option><option>Bangalore</option><option>Chennai</option></select>
+   </div>
+   <div class="row" style="margin-top:12px">
+    <button class="btn green" style="flex:1" id="stSave" onclick="saveStaff()">Save</button>
+    <button class="btn ghost" id="stCancel" style="display:none" onclick="resetStaffForm()">Cancel</button>
+   </div>
+  </div>
+  <div class="card">
+   <h3>Current staff</h3>
+   <div id="staffList"><div class="empty">Loading…</div></div>
+  </div>
+ </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- config ---------- */
+const PROD_HOSTS=['orders.eronix.in'];        // demo can NEVER be true on these
+const DEMO_INTENT=true;                        // set false for a locked production build
+const DEMO_MODE = DEMO_INTENT && !PROD_HOSTS.includes((location.hostname||'').toLowerCase());
+const API='/.netlify/functions/aggregation';
+
+/* ---------- serial helpers (mirror _serial.mjs machine form) ---------- */
+const ITEM4={'EUPH-ANC-BLK':'EUAN','AURA-TWS-WHT':'AUTW','QMAG-PB-10K':'QM10','GAN3-65W':'GN65','GAN3-45W':'GN45','AVNT-CL-CBL':'AVCL','PDS-25W-ADP':'PD25','MAG3-STND':'MG3S'};
+const PRIMARY_RE=/^ERX[A-Z0-9]{4}\d{12}$/,OC_RE=/^OC[A-Z0-9]{4}\d{10}$/,MC_RE=/^MC[A-Z0-9]{4}\d{9}$/;
+function gs1Check(s){let sum=0;for(let i=0;i<s.length;i++)sum+=(+s[s.length-1-i])*(i%2===0?3:1);return (10-(sum%10))%10;}
+function checkOk(c,d){const g=c.slice(d);return gs1Check(g.slice(0,-1))===+g.slice(-1);}
+function classifyCode(code){const c=String(code||'').trim().toUpperCase();if(MC_RE.test(c))return checkOk(c,6)?'mc':'mc_bad';if(OC_RE.test(c))return checkOk(c,6)?'oc':'oc_bad';if(PRIMARY_RE.test(c))return checkOk(c,7)?'primary':'primary_bad';return 'unknown';}
+function parseItem(c){c=c.toUpperCase();if(MC_RE.test(c)||OC_RE.test(c))return c.slice(2,6);if(PRIMARY_RE.test(c))return c.slice(3,7);return null;}
+function parseBatch(c){c=c.toUpperCase();if(MC_RE.test(c)||OC_RE.test(c))return c.slice(6,10);if(PRIMARY_RE.test(c))return c.slice(7,11);return null;}
+function genPrimaryRaw(item,ww,n){const b=ww+String(n).padStart(7,'0');return 'ERX'+item+b+gs1Check(b);}
+function expandRangeCodes(start,count){const c=String(start||'').toUpperCase();if(classifyCode(c)!=='primary'||!(count>=1))return [];const item=c.slice(3,7),ww=c.slice(7,11),s0=Number(c.slice(11,18));if(s0+count-1>9999999)return [];const out=[];for(let i=0;i<count;i++)out.push(genPrimaryRaw(item,ww,s0+i));return out;}
+
+/* ---------- demo in-memory aggregation store (mirrors _aggregation.mjs) ---------- */
+const MAP={unit:{},oc:{},mc:{}};
+function demoImport(payload){let units=0,ocs=0,mcs=0;const errors=[];
+ for(const carton of (payload.cartons||[])){const mc=String(carton.mc||'').toUpperCase();
+  if(classifyCode(mc)!=='mc'){errors.push('bad MC '+mc);continue;}
+  const item=parseItem(mc),batch=parseBatch(mc),ocCodes=[];
+  for(const o of (carton.ocs||[])){const oc=String(o.oc||'').toUpperCase();
+   if(classifyCode(oc)!=='oc'){errors.push('bad OC '+oc);continue;}
+   let serials=Array.isArray(o.serials)&&o.serials.length?o.serials.map(s=>s.toUpperCase()):(o.start&&o.count?expandRangeCodes(o.start,+o.count):[]);
+   const bad=serials.filter(s=>classifyCode(s)!=='primary');
+   if(!serials.length||bad.length){errors.push('bad serials in '+oc+(bad.length?' ('+bad.length+')':' (empty)'));continue;}
+   serials.forEach(s=>MAP.unit[s]={serial:s,item,batch,oc,mc,status:'in_stock'});
+   MAP.oc[oc]={oc,mc,item,batch,serials};ocCodes.push(oc);ocs++;units+=serials.length;}
+  MAP.mc[mc]={mc,item,batch,ocs:ocCodes};mcs++;}
+ return {mcs,ocs,units,errors};}
+function demoLookup(code){const c=code.toUpperCase(),k=classifyCode(c);
+ if(k==='primary')return MAP.unit[c]?{kind:'unit',...MAP.unit[c]}:null;
+ if(k==='oc')return MAP.oc[c]?{kind:'oc',...MAP.oc[c]}:null;
+ if(k==='mc'){const n=MAP.mc[c];if(!n)return null;let total=0,inStock=0;const ocs=n.ocs.map(oc=>{const ser=(MAP.oc[oc]||{}).serials||[];let i=0;ser.forEach(s=>{if((MAP.unit[s]||{}).status==='in_stock')i++;});total+=ser.length;inStock+=i;return {oc,total:ser.length,inStock:i};});
+  return {kind:'mc',mc:c,total,inStock,state:inStock===total?'intact':inStock===0?'empty':'opened',ocs};}
+ return null;}
+
+/* ---------- server bridge ---------- */
+async function apiImport(payload){if(DEMO_MODE)return demoImport(payload);
+ const r=await fetch(API,{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+ if(!r.ok)throw new Error(await r.text()||('import '+r.status));return r.json();}
+async function apiLook(code){if(DEMO_MODE)return demoLookup(code);
+ const k=classifyCode(code);const q=k==='mc'?('?mc='+encodeURIComponent(code)):k==='oc'?('?oc='+encodeURIComponent(code)):('?code='+encodeURIComponent(code));
+ const r=await fetch(API+q,{credentials:'include'});if(r.status===404)return null;if(!r.ok)throw new Error('lookup '+r.status);
+ const j=await r.json();
+ if(k==='mc')return {kind:'mc',...j};if(k==='oc')return {kind:'oc',...j};
+ return j.type&&j.type!=='primary'?{kind:j.type,...j}:{kind:'unit',...j};}
+
+/* ---------- toast / tabs ---------- */
+let tT;function toast(m,c){const t=document.getElementById('toast');t.textContent=m;t.style.borderColor=c||'var(--sep)';t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),2600);}
+function tab(p){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.p===p));document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('on',x.id==='p-'+p));if(p==='station')document.getElementById('scan').focus();if(p==='staff')loadStaff();}
+
+/* ===================== PACKING STATION ===================== */
+let pk={mc:null,ocs:[],active:null};
+function onScan(raw){const c=String(raw||'').trim().toUpperCase();if(!c)return;const k=classifyCode(c);
+ if(k.endsWith('_bad')){toast('Check digit failed — re-scan '+c,'var(--red)');return;}
+ if(k==='mc'){if(pk.mc&&(pk.ocs.length||pk.active)){toast('Commit or clear the current master carton first','var(--amber)');return;}pk.mc=c;toast('Master carton set · '+c,'var(--green)');renderBuild();return;}
+ if(k==='oc'){if(!pk.mc){toast('Scan the master carton first','var(--amber)');return;}if(parseItem(c)!==parseItem(pk.mc)){toast('That OC is a different product than the MC','var(--amber)');return;}if(pk.active)sealOc(true);pk.active={oc:c,serials:[]};toast('Outer carton open · '+c,'var(--teal)');renderBuild();return;}
+ if(k==='primary'){if(!pk.active){toast('Open an outer carton before scanning units','var(--amber)');return;}if(allSerials().has(c)){toast('Already in this carton','var(--amber)');return;}if(parseItem(c)!==parseItem(pk.active.oc)){toast('Unit is a different product than the OC','var(--amber)');return;}pk.active.serials.push(c);renderBuild();return;}
+ toast('Unrecognized code','var(--amber)');}
+function allSerials(){const s=new Set();pk.ocs.forEach(o=>o.serials.forEach(x=>s.add(x)));(pk.active?.serials||[]).forEach(x=>s.add(x));return s;}
+function rangeIntoActive(){if(!pk.active){toast('Open an outer carton first','var(--amber)');return;}
+ const start=document.getElementById('rfStart').value.trim().toUpperCase(),n=parseInt(document.getElementById('rfCount').value,10);
+ if(classifyCode(start)!=='primary'){toast('Enter a valid first serial','var(--amber)');return;}if(!(n>=1)){toast('Enter a count','var(--amber)');return;}
+ if(parseItem(start)!==parseItem(pk.active.oc)){toast('Range is a different product than the OC','var(--amber)');return;}
+ const run=expandRangeCodes(start,n);if(!run.length){toast('Could not expand that range','var(--amber)');return;}
+ let added=0;run.forEach(s=>{if(!allSerials().has(s)){pk.active.serials.push(s);added++;}});
+ document.getElementById('rfStart').value='';document.getElementById('rfCount').value='';
+ toast('Filled +'+added+' units into '+pk.active.oc,'var(--green)');renderBuild();}
+function sealOc(quiet){if(!pk.active)return;if(!pk.active.serials.length){toast('Outer carton is empty','var(--amber)');return;}pk.ocs.push(pk.active);const o=pk.active.oc;pk.active=null;renderBuild();if(!quiet)toast('Sealed '+o,'var(--teal)');}
+function removeUnit(i){pk.active.serials.splice(i,1);renderBuild();}
+function dropOc(i){pk.ocs.splice(i,1);renderBuild();}
+function resetPk(){pk={mc:null,ocs:[],active:null};renderBuild();}
+async function commitMc(){if(!pk.mc){toast('Scan a master carton first','var(--amber)');return;}if(pk.active)sealOc(true);
+ if(!pk.ocs.length){toast('Add at least one outer carton','var(--amber)');return;}
+ const payload={cartons:[{mc:pk.mc,ocs:pk.ocs.map(o=>({oc:o.oc,serials:o.serials}))}]};
+ try{const r=await apiImport(payload);if(r.errors&&r.errors.length){toast('Import issues: '+r.errors[0],'var(--red)');return;}
+  toast('✓ Committed '+pk.mc+' · '+r.units+' units mapped','var(--green)');resetPk();}
+ catch(e){toast('Commit failed — '+e.message,'var(--red)');}}
+function renderBuild(){const el=document.getElementById('buildBody');
+ if(!pk.mc){el.innerHTML='<div class="empty">Scan a master carton to begin.</div>';return;}
+ const total=[...allSerials()].length;
+ let h=`<div class="mcline"><div><div class="t">${pk.mc}</div><div class="m">${pk.ocs.length} sealed OC · ${total} units</div></div><span class="del" onclick="resetPk()">clear</span></div>`;
+ pk.ocs.forEach((o,i)=>{h+=`<div class="octag"><span class="nm">${o.oc}</span><span><span class="ct">${o.serials.length} units</span> <span class="del" onclick="dropOc(${i})">✕</span></span></div>`;});
+ if(pk.active){h+=`<div class="ocrow"><div class="octag" style="margin:0;border:none;background:none;padding:0"><span class="nm" style="color:var(--teal)">▸ ${pk.active.oc} (open)</span><span class="ct">${pk.active.serials.length} units</span></div>`;
+  h+=`<div class="chips">${pk.active.serials.map((s,i)=>`<span class="chip">${s}<span class="x" onclick="removeUnit(${i})">✕</span></span>`).join('')||'<span class="muted">Scan units or fill from a first S/N.</span>'}</div></div>`;}
+ el.innerHTML=h;}
+
+/* ===================== BULK IMPORT ===================== */
+let blk=[];
+function blankOc(){return {oc:'',mode:'range',start:'',count:'',list:''};}
+function addMc(){blk.push({mc:'',ocs:[blankOc()]});renderBulk();}
+function addOc(m){blk[m].ocs.push(blankOc());renderBulk();}
+function delMc(m){blk.splice(m,1);renderBulk();}
+function delOc(m,o){blk[m].ocs.splice(o,1);if(!blk[m].ocs.length)blk[m].ocs.push(blankOc());renderBulk();}
+function setMode(m,o,mode){blk[m].ocs[o].mode=mode;renderBulk();}
+function bind(m,o,f,v){blk[m].ocs[o][f]=v;}
+function bindMc(m,v){blk[m].mc=v;}
+function renderBulk(){const el=document.getElementById('bulkBody');document.getElementById('importBtn').disabled=true;document.getElementById('bulkPreview').innerHTML='';
+ el.innerHTML=blk.map((mc,m)=>`<div class="card" style="background:var(--surface2);margin-bottom:12px">
+  <div class="row"><input class="in" placeholder="Master carton code (MC…)" value="${mc.mc||''}" oninput="bindMc(${m},this.value)"><span class="del" style="align-self:center" onclick="delMc(${m})">remove</span></div>
+  ${mc.ocs.map((o,i)=>`<div class="ocrow">
+    <div class="row"><input class="in sm" placeholder="Outer carton code (OC…)" value="${o.oc||''}" oninput="bind(${m},${i},'oc',this.value)"><span class="del" style="align-self:center" onclick="delOc(${m},${i})">✕</span></div>
+    <div class="mode" style="margin-top:8px"><button class="${o.mode==='range'?'on':''}" onclick="setMode(${m},${i},'range')">Range</button><button class="${o.mode==='list'?'on':''}" onclick="setMode(${m},${i},'list')">Serial list</button></div>
+    ${o.mode==='range'
+      ?`<div class="row"><input class="in sm" placeholder="First S/N (ERX…)" value="${o.start||''}" oninput="bind(${m},${i},'start',this.value)"><input class="in sm" style="max-width:92px" placeholder="count" inputmode="numeric" value="${o.count||''}" oninput="bind(${m},${i},'count',this.value)"></div>`
+      :`<textarea class="in sm" style="width:100%;min-height:64px;resize:vertical" placeholder="Paste serials — one per line or comma-separated" oninput="bind(${m},${i},'list',this.value)">${o.list||''}</textarea>`}
+   </div>`).join('')}
+  <span class="add" onclick="addOc(${m})">+ Add outer carton</span>
+ </div>`).join('');}
+function buildBulkPayload(){const cartons=[],errors=[];
+ blk.forEach((mc,m)=>{const code=(mc.mc||'').trim().toUpperCase();if(!code){errors.push('MC #'+(m+1)+': missing code');return;}
+  if(classifyCode(code)!=='mc')errors.push(code+': not a valid master-carton code');
+  const ocs=[];mc.ocs.forEach((o,i)=>{const oc=(o.oc||'').trim().toUpperCase();if(!oc)return;
+   if(classifyCode(oc)!=='oc'){errors.push(oc+': not a valid outer-carton code');return;}
+   if(o.mode==='range'){const start=(o.start||'').trim().toUpperCase(),n=parseInt(o.count,10);
+    if(classifyCode(start)!=='primary'){errors.push(oc+': bad first serial');return;}if(!(n>=1)){errors.push(oc+': bad count');return;}
+    const run=expandRangeCodes(start,n);if(!run.length){errors.push(oc+': range overflow');return;}ocs.push({oc,serials:run});}
+   else{const list=(o.list||'').split(/[\s,]+/).map(s=>s.trim().toUpperCase()).filter(Boolean);
+    const bad=list.filter(s=>classifyCode(s)!=='primary');if(!list.length){errors.push(oc+': no serials');return;}if(bad.length){errors.push(oc+': '+bad.length+' invalid serial(s)');return;}ocs.push({oc,serials:list});}});
+  if(ocs.length)cartons.push({mc:code,ocs});else errors.push(code+': no valid outer cartons');});
+ return {cartons,errors};}
+function previewBulk(){const {cartons,errors}=buildBulkPayload();const pv=document.getElementById('bulkPreview');
+ const units=cartons.reduce((s,c)=>s+c.ocs.reduce((a,o)=>a+o.serials.length,0),0);
+ let h='';if(cartons.length)h+=`<div style="color:var(--green);margin-top:10px">✓ ${cartons.length} MC · ${cartons.reduce((s,c)=>s+c.ocs.length,0)} OC · ${units} units ready</div>`;
+ if(errors.length)h+=`<div style="color:var(--red);margin-top:8px">${errors.map(e=>'• '+e).join('<br>')}</div>`;
+ pv.innerHTML=h;document.getElementById('importBtn').disabled=!(cartons.length&&!errors.length);}
+async function importBulk(){const {cartons,errors}=buildBulkPayload();if(errors.length||!cartons.length){previewBulk();return;}
+ try{const r=await apiImport({cartons});if(r.errors&&r.errors.length){toast('Server rejected: '+r.errors[0],'var(--red)');return;}
+  toast('✓ Imported '+r.mcs+' MC · '+r.units+' units','var(--green)');blk=[{mc:'',ocs:[blankOc()]}];renderBulk();}
+ catch(e){toast('Import failed — '+e.message,'var(--red)');}}
+
+/* ===================== LOOK UP ===================== */
+async function doLook(){const code=document.getElementById('lookCode').value.trim().toUpperCase();const el=document.getElementById('lookResult');
+ if(!code){el.innerHTML='';return;}const k=classifyCode(code);
+ if(k==='unknown'||k.endsWith('_bad')){el.innerHTML=`<div class="muted" style="color:var(--amber)">Not a recognized ERONIX code.</div>`;return;}
+ try{const r=await apiLook(code);if(!r){el.innerHTML=`<div class="muted" style="color:var(--label3);margin-top:12px">Not found in the aggregation map.</div>`;return;}
+  if(r.kind==='unit')el.innerHTML=`<div class="result" style="margin-top:14px"><div><span class="k">Serial</span> &nbsp;<span class="v">${r.serial}</span></div><div><span class="k">Outer carton</span> &nbsp;<span class="v">${r.oc||'—'}</span></div><div><span class="k">Master carton</span> &nbsp;<span class="v">${r.mc||'—'}</span></div><div><span class="k">Status</span> &nbsp;<span class="v">${r.status||'in_stock'}</span></div></div>`;
+  else if(r.kind==='oc')el.innerHTML=`<div class="result" style="margin-top:14px"><div><span class="k">Outer carton</span> &nbsp;<span class="v">${r.oc}</span> &nbsp;<span class="k">in</span> <span class="v">${r.mc}</span></div><div><span class="k">Units</span> &nbsp;<span class="v">${(r.serials||[]).length}</span></div></div><div class="chips">${(r.serials||[]).map(s=>`<span class="chip">${s}</span>`).join('')}</div>`;
+  else if(r.kind==='mc'){const st=r.state||'intact';el.innerHTML=`<div class="result" style="margin-top:14px"><div><span class="k">Master carton</span> &nbsp;<span class="v">${r.mc}</span> &nbsp;<span class="pill ${st}">${st}</span></div><div><span class="k">In stock</span> &nbsp;<span class="v">${r.inStock} / ${r.total}</span> units</div></div>`+
+   `${(r.ocs||[]).map(o=>`<div class="octag"><span class="nm">${o.oc}</span><span class="ct">${o.inStock}/${o.total} in stock</span></div>`).join('')}`;}
+ }catch(e){el.innerHTML=`<div class="muted" style="color:var(--red)">Lookup failed — ${e.message}</div>`;}}
+
+/* ===================== STAFF ===================== */
+const STAFF_API='/.netlify/functions/staff';
+const escH=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const emailRe=/^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+let editingEmail=null;
+let DEMO_STAFF=[
+ {email:'priya.acc@eronix.in',name:'Priya Sen',role:'accounts',city:'Kolkata',source:'env'},
+ {email:'rohan.wh@eronix.in',name:'Rohan Das',role:'warehouse',city:'Kolkata',source:'added'},
+ {email:'meera.acc@eronix.in',name:'Meera Rao',role:'accounts',city:'Mumbai',source:'added'},
+ {email:'admin@eronix.in',name:'Admin',role:'admin',city:'Kolkata',source:'env'},
+];
+async function apiStaffList(){
+ if(DEMO_MODE)return DEMO_STAFF.slice().sort((a,b)=>(a.city+a.role+a.email).localeCompare(b.city+b.role+b.email));
+ const r=await fetch(STAFF_API,{credentials:'include'});if(!r.ok)throw new Error('list '+r.status);return (await r.json()).staff;
+}
+async function apiStaffSave(rec){
+ if(DEMO_MODE){
+  if(rec.role!=='admin'){const wasAdmin=DEMO_STAFF.some(s=>s.email===rec.email&&s.role==='admin');const others=DEMO_STAFF.filter(s=>s.role==='admin'&&s.email!==rec.email).length;if(wasAdmin&&others===0)throw new Error('Cannot demote the last admin');}
+  const i=DEMO_STAFF.findIndex(s=>s.email===rec.email);
+  if(i>=0)DEMO_STAFF[i]={...rec,source:DEMO_STAFF[i].source};else DEMO_STAFF.push({...rec,source:'added'});
+  return;}
+ const r=await fetch(STAFF_API,{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(rec)});
+ if(!r.ok)throw new Error(await r.text()||('save '+r.status));
+}
+async function apiStaffRemove(email){
+ if(DEMO_MODE){const t=DEMO_STAFF.find(s=>s.email===email);if(t&&t.role==='admin'&&DEMO_STAFF.filter(s=>s.role==='admin'&&s.email!==email).length===0)throw new Error('Cannot remove the last admin');DEMO_STAFF=DEMO_STAFF.filter(s=>s.email!==email);return;}
+ const r=await fetch(STAFF_API+'?email='+encodeURIComponent(email),{method:'DELETE',credentials:'include'});
+ if(!r.ok)throw new Error(await r.text()||('remove '+r.status));
+}
+async function loadStaff(){
+ const el=document.getElementById('staffList');el.innerHTML='<div class="empty">Loading…</div>';
+ try{const staff=await apiStaffList();window._staffCache=staff;
+  if(!staff.length){el.innerHTML='<div class="empty">No staff yet.</div>';return;}
+  el.innerHTML=staff.map(s=>`<div class="srow"><div><div class="nm">${escH(s.name)}</div><div class="meta"><span class="pill ${s.role}">${s.role}</span><span class="em">${escH(s.email)} · ${escH(s.city)}</span><span class="srctag">${s.source==='env'?'env':'added'}</span></div></div><div class="acts"><button class="ed" onclick="editStaff('${escH(s.email)}')">Edit</button><button class="rm" onclick="removeStaff('${escH(s.email)}')">Remove</button></div></div>`).join('');
+ }catch(e){el.innerHTML='<div class="empty" style="color:var(--red)">Could not load — '+escH(e.message)+'</div>';}
+}
+function editStaff(email){
+ const src=(window._staffCache||[]).find(x=>x.email===email);if(!src)return;
+ editingEmail=email;
+ const E=document.getElementById('stEmail');E.value=src.email;E.disabled=true;
+ document.getElementById('stName').value=src.name;document.getElementById('stRole').value=src.role;document.getElementById('stCity').value=src.city;
+ document.getElementById('staffFormTitle').textContent='Edit staff';document.getElementById('stCancel').style.display='inline-flex';
+ document.getElementById('stName').focus();window.scrollTo({top:0,behavior:'smooth'});
+}
+function resetStaffForm(){editingEmail=null;const E=document.getElementById('stEmail');E.value='';E.disabled=false;document.getElementById('stName').value='';document.getElementById('stRole').value='accounts';document.getElementById('stCity').value='Kolkata';document.getElementById('staffFormTitle').textContent='Add staff';document.getElementById('stCancel').style.display='none';}
+async function saveStaff(){
+ const rec={email:document.getElementById('stEmail').value.trim().toLowerCase(),name:document.getElementById('stName').value.trim(),role:document.getElementById('stRole').value,city:document.getElementById('stCity').value};
+ if(!emailRe.test(rec.email)){toast('Enter a valid email','var(--amber)');return;}
+ if(!rec.name){toast('Enter a name','var(--amber)');return;}
+ try{const wasEdit=editingEmail;await apiStaffSave(rec);toast((wasEdit?'Updated ':'Added ')+rec.email,'var(--green)');resetStaffForm();loadStaff();}
+ catch(e){toast(e.message,'var(--red)');}
+}
+async function removeStaff(email){
+ if(!confirm('Remove '+email+' from staff?'))return;
+ try{await apiStaffRemove(email);toast('Removed '+email,'var(--green)');loadStaff();}
+ catch(e){toast(e.message,'var(--red)');}
+}
+
+/* ---------- boot + admin gate ---------- */
+function showApp(name){document.getElementById('who').innerHTML=name?('<b>'+name+'</b> · admin'):'';document.getElementById('gate').classList.add('hide');document.getElementById('scan').focus();}
+function denyGate(h,p){const g=document.getElementById('gate');g.classList.remove('hide');document.getElementById('gateH').textContent=h;document.getElementById('gateP').textContent=p;}
+function boot(){
+ renderBuild();blk=[{mc:'',ocs:[blankOc()]}];renderBulk();
+ if(DEMO_MODE){document.getElementById('demobar').style.display='block';
+  if(PROD_HOSTS.includes(location.hostname))document.getElementById('demobar').innerHTML='⚠ DEMO is ON in production — set DEMO_MODE=false';
+  showApp('Demo admin');return;}
+ fetch('/.netlify/functions/auth-me',{credentials:'include'}).then(r=>r.ok?r.json():Promise.reject()).then(s=>{
+  if(s.role!=='admin'){denyGate('Admin only','The aggregation desk is restricted to admin staff. Ask an admin to build the carton map.');return;}
+  showApp(s.name);
+ }).catch(()=>denyGate('Sign in required','Open the Order Desk, sign in as an admin, then return here.'));
+}
+boot();
+</script>
+</body>
+</html>
